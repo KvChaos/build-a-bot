@@ -1,4 +1,4 @@
-# build-a-bot
+# build-a-bot - Taking a Course
 
 ## Project setup
 ```
