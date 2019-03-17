@@ -80,11 +80,24 @@ import CollapsibleSection from "../shared/CollapsibleSection.vue";
 
 export default {
   name: "RobotBuilder",
+  beforeRouteLeave(to, from, next) {
+    // When building a route guard on a component, you have to include the word 'Route' -- so this is beforeRouteLeave
+    // Warn the user if they try to leave the page without adding their robot to the card.
+    if (this.addedToCart) {
+      next(true);
+    } else {
+      const response = confirm(
+        "You have no added your robot to your cart.   Are you sure you want to leave?"
+      );
+      next(response);
+    }
+  },
   components: { PartSelector, CollapsibleSection },
   mixins: [createdHookMixin],
   data() {
     return {
       availableParts,
+      addedToCart: false,
       cart: [],
       selectedRobot: {
         head: {},
@@ -105,6 +118,7 @@ export default {
         robot.torso.cost +
         robot.base.cost;
       this.cart.push(Object.assign({}, robot, { cost })); // This is a form of _.extend into that first empty object.
+      this.addedToCart = true;
     }
   },
   computed: {

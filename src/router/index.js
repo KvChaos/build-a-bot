@@ -62,7 +62,12 @@ const routes = [{
     path: '/parts/:partType/:id',
     name: 'Parts',
     component: PartInfo,
-    props: true // Vue will now pass the route parameters on this route as props instead of route params
+    props: true, // Vue will now pass the route parameters on this route as props instead of route params
+    beforeEnter(to, from, next) {
+      // Route Guard implemented on the route:  prevent navigation if the :id is not numeric.
+      const isValidId = Number.isInteger(Number(to.params.id));
+      next(isValidId); // Permits navigation if id is a valid integer.
+    }
   },
 ];
 
