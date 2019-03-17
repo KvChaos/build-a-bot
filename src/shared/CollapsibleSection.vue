@@ -9,19 +9,19 @@
             <div>Default Content</div>
         </slot>
     </div>
-    
+
 </template>
 
 
 <script>
-    export default {
-        name: "CollapsibleSection",
-        data() {
-            return {
-                open: true
-            };
-        }
-    }
+export default {
+  name: 'CollapsibleSection',
+  data() {
+    return {
+      open: true,
+    };
+  },
+};
 </script>
 
 
