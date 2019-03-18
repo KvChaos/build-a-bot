@@ -34,35 +34,38 @@
 </template>
 
 <script>
-export default {
-  name: "Cart",
-  computed: {
-    cart() {
-      // Use a computed property to access the cart property from the Vuex store.  Note that in a read-only situation, we can reach directly into the store's state to read the cart.
-      return this.$store.state.robots.cart;
-    },
-    cartSaleItems() {
-      return this.$store.getters.cartSaleItems; // Note that we accessed this with a getter -- as an item, not a function.
+  export default {
+    name: "Cart",
+    computed: {
+      cart() {
+        // Use a computed property to access the cart property from the Vuex store.  Note that in a read-only situation, we can reach directly into the store's state to read the cart.
+        return this.$store.state.robots.cart;
+      },
+      cartSaleItems() {
+        return this.$store.getters.cartSaleItems; // Note that we accessed this with a getter -- the getter is a function, but we only reference it, not call it.
+      }
     }
-  }
-};
+  };
 </script>
 
 <style scoped>
-td,
-th {
-  padding: 5px;
-}
-.robot-title {
-  text-align: left;
-  padding-right: 200px;
-}
-.cost {
-  text-align: right;
-}
-.saleItems {
-  margin-top: 50px;
-  font-size: 18px;
-  color: red;
-}
+  td,
+  th {
+    padding: 5px;
+  }
+
+  .robot-title {
+    text-align: left;
+    padding-right: 200px;
+  }
+
+  .cost {
+    text-align: right;
+  }
+
+  .saleItems {
+    margin-top: 50px;
+    font-size: 18px;
+    color: red;
+  }
 </style>

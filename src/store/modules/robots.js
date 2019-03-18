@@ -1,11 +1,8 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
 import axios from 'axios';
 
-Vue.use(Vuex);
+// Remember that in a modules file, you are only exporting an object with all the necessary state, mutations, getters, actions, etc...  Not actually creating a second Vuex store.
 
-
-export default new Vuex.Store({
+export default {
 
   state: {
     // All data objects must be initialized with a default value...so Vue can perform change detection
@@ -59,5 +56,4 @@ export default new Vuex.Store({
   }
 
 
-
-});
+};

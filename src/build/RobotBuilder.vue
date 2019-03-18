@@ -56,247 +56,248 @@
 
 
 <script>
-// import availableParts from "../data/parts";   // Before server, we were reading data from a JSON file; this is now a computed property below.
-import createdHookMixin from "./created-hook-mixin";
-import PartSelector from "./PartSelector.vue";
-import CollapsibleSection from "../shared/CollapsibleSection.vue";
+  // import availableParts from "../data/parts";   // Before server, we were reading data from a JSON file; this is now a computed property below.
+  import createdHookMixin from "./created-hook-mixin";
+  import PartSelector from "./PartSelector.vue";
+  import CollapsibleSection from "../shared/CollapsibleSection.vue";
 
-export default {
-  name: "RobotBuilder",
-  created() {
-    // Instructs the store to invoke its getParts() action; this component will see the results through the new availableParts computed property which reads the store.
-    this.$store.dispatch("getParts");
-  },
-  beforeRouteLeave(to, from, next) {
-    // When building a route guard on a component, you have to include the word 'Route' -- so this is beforeRouteLeave
-    // Warn the user if they try to leave the page without adding their robot to the card.
-    if (this.addedToCart) {
-      next(true);
-    } else {
-      const response = confirm(
-        "You have no added your robot to your cart.   Are you sure you want to leave?"
-      );
-      next(response);
-    }
-  },
-  components: { PartSelector, CollapsibleSection },
-  mixins: [createdHookMixin],
-  data() {
-    return {
-      // availableParts,
-      addedToCart: false,
-      cart: [],
-      selectedRobot: {
-        head: {},
-        leftArm: {},
-        rightArm: {},
-        torso: {},
-        base: {}
+  export default {
+    name: "RobotBuilder",
+    created() {
+      // Instructs the store to invoke its getParts() action; this component will see the results through the new availableParts computed property which reads the store.
+      this.$store.dispatch('getParts');
+    },
+    beforeRouteLeave(to, from, next) {
+      // When building a route guard on a component, you have to include the word 'Route' -- so this is beforeRouteLeave
+      // Warn the user if they try to leave the page without adding their robot to the card.
+      if (this.addedToCart) {
+        next(true);
       }
-    };
-  },
-  methods: {
-    async addToCart() {
-      const robot = this.selectedRobot;
-      const cost =
-        robot.head.cost +
-        robot.leftArm.cost +
-        robot.rightArm.cost +
-        robot.torso.cost +
-        robot.base.cost;
-
-      // Commit a change to the Vuex store.  The first parameter is the name of the mutation; the second is the data to be sent to the mutation.
-      // After we added the server, we aren't doing this anymore; instead we are dispatching an action to the server.  See the addRobotToCart action in the store.
-      // this.$store.commit("addRobotToCart", Object.assign({}, robot, { cost })); // Object.assign() is a form of _.extend into that first empty object.
-
-      // Call an action on the store.   (Remember, you commit mutations, but you dispatch actions.)
-      // Because the store's action addRobotToCart returns a promise, we can catch promise and when it is resolved, redirect the browser to the cart.
-      await this.$store.dispatch(
-        "addRobotToCart",
-        Object.assign({}, robot, { cost })
-      );
-      this.addedToCart = true;
-      this.$router.push("/cart");
-    }
-  },
-  computed: {
-    headBorderStyle() {
-      const border = this.selectedRobot.head.onSale
-        ? "solid red 3px"
-        : "solid #aaa 3px";
-      return { border };
+      else {
+        const response = confirm(
+          "You have no added your robot to your cart.   Are you sure you want to leave?"
+        );
+        next(response);
+      }
     },
-    saleBorderClass() {
-      return this.selectedRobot.head.onSale ? "sale-border" : "";
+    components: { PartSelector, CollapsibleSection },
+    mixins: [createdHookMixin],
+    data() {
+      return {
+        // availableParts,
+        addedToCart: false,
+        cart: [],
+        selectedRobot: {
+          head: {},
+          leftArm: {},
+          rightArm: {},
+          torso: {},
+          base: {}
+        }
+      };
     },
-    availableParts() {
-      // This computed property will get updated whenever the store's state.parts value changes (including when the axios call finishes pulling data back from the server).
-      return this.$store.state.robots.parts;
+    methods: {
+      async addToCart() {
+        const robot = this.selectedRobot;
+        const cost =
+          robot.head.cost +
+          robot.leftArm.cost +
+          robot.rightArm.cost +
+          robot.torso.cost +
+          robot.base.cost;
+
+        // Commit a change to the Vuex store.  The first parameter is the name of the mutation; the second is the data to be sent to the mutation.
+        // After we added the server, we aren't doing this anymore; instead we are dispatching an action to the server.  See the addRobotToCart action in the store.
+        // this.$store.commit("addRobotToCart", Object.assign({}, robot, { cost })); // Object.assign() is a form of _.extend into that first empty object.
+
+        // Call an action on the store.   (Remember, you commit mutations, but you dispatch actions.)
+        // Because the store's action addRobotToCart returns a promise, we can catch promise and when it is resolved, redirect the browser to the cart.
+        await this.$store.dispatch(
+          "addRobotToCart",
+          Object.assign({}, robot, { cost })
+        );
+        this.addedToCart = true;
+        this.$router.push("/cart");
+      }
+    },
+    computed: {
+      headBorderStyle() {
+        const border = this.selectedRobot.head.onSale ?
+          "solid red 3px" :
+          "solid #aaa 3px";
+        return { border };
+      },
+      saleBorderClass() {
+        return this.selectedRobot.head.onSale ? "sale-border" : "";
+      },
+      availableParts() {
+        // This computed property will get updated whenever the store's state.parts value changes (including when the axios call finishes pulling data back from the server).
+        return this.$store.state.robots.parts;
+      }
     }
-  }
-};
+  };
 </script>
 
 <style lang="scss" scoped>
-.part {
-  position: relative;
-  width: 165px;
-  height: 165px;
-  border: 3px solid #aaa;
-}
-
-.part {
-  img {
+  .part {
+    position: relative;
     width: 165px;
+    height: 165px;
+    border: 3px solid #aaa;
   }
-}
 
-.top-row {
-  display: flex;
-  justify-content: space-around;
-}
+  .part {
+    img {
+      width: 165px;
+    }
+  }
 
-.middle-row {
-  display: flex;
-  justify-content: center;
-}
+  .top-row {
+    display: flex;
+    justify-content: space-around;
+  }
 
-.bottom-row {
-  display: flex;
-  justify-content: space-around;
-  border-top: none;
-}
+  .middle-row {
+    display: flex;
+    justify-content: center;
+  }
 
-.head {
-  border-bottom: none;
-}
+  .bottom-row {
+    display: flex;
+    justify-content: space-around;
+    border-top: none;
+  }
 
-.left {
-  border-right: none;
-}
+  .head {
+    border-bottom: none;
+  }
 
-.right {
-  border-left: none;
-}
+  .left {
+    border-right: none;
+  }
 
-.left img {
-  transform: rotate(-90deg);
-}
+  .right {
+    border-left: none;
+  }
 
-.right img {
-  transform: rotate(90deg);
-}
+  .left img {
+    transform: rotate(-90deg);
+  }
 
-.bottom {
-  border-top: none;
-}
+  .right img {
+    transform: rotate(90deg);
+  }
 
-.prev-selector {
-  position: absolute;
-  z-index: 1;
-  top: -3px;
-  left: -28px;
-  width: 25px;
-  height: 171px;
-}
+  .bottom {
+    border-top: none;
+  }
 
-.next-selector {
-  position: absolute;
-  z-index: 1;
-  top: -3px;
-  right: -28px;
-  width: 25px;
-  height: 171px;
-}
+  .prev-selector {
+    position: absolute;
+    z-index: 1;
+    top: -3px;
+    left: -28px;
+    width: 25px;
+    height: 171px;
+  }
 
-.center .prev-selector,
-.center .next-selector {
-  opacity: 0.8;
-}
+  .next-selector {
+    position: absolute;
+    z-index: 1;
+    top: -3px;
+    right: -28px;
+    width: 25px;
+    height: 171px;
+  }
 
-.left .prev-selector {
-  top: -28px;
-  left: -3px;
-  width: 144px;
-  height: 25px;
-}
+  .center .prev-selector,
+  .center .next-selector {
+    opacity: 0.8;
+  }
 
-.left .next-selector {
-  top: auto;
-  bottom: -28px;
-  left: -3px;
-  width: 144px;
-  height: 25px;
-}
+  .left .prev-selector {
+    top: -28px;
+    left: -3px;
+    width: 144px;
+    height: 25px;
+  }
 
-.right .prev-selector {
-  top: -28px;
-  left: 24px;
-  width: 144px;
-  height: 25px;
-}
+  .left .next-selector {
+    top: auto;
+    bottom: -28px;
+    left: -3px;
+    width: 144px;
+    height: 25px;
+  }
 
-.right .next-selector {
-  top: auto;
-  bottom: -28px;
-  left: 24px;
-  width: 144px;
-  height: 25px;
-}
+  .right .prev-selector {
+    top: -28px;
+    left: 24px;
+    width: 144px;
+    height: 25px;
+  }
 
-.right .next-selector {
-  right: -3px;
-}
+  .right .next-selector {
+    top: auto;
+    bottom: -28px;
+    left: 24px;
+    width: 144px;
+    height: 25px;
+  }
 
-.robot-name {
-  position: absolute;
-  top: -25px;
-  text-align: center;
-  width: 100%;
-}
+  .right .next-selector {
+    right: -3px;
+  }
 
-.sale {
-  color: red;
-}
+  .robot-name {
+    position: absolute;
+    top: -25px;
+    text-align: center;
+    width: 100%;
+  }
 
-.content {
-  position: relative;
-}
+  .sale {
+    color: red;
+  }
 
-.add-to-cart {
-  position: absolute;
-  width: 210px;
-  padding: 3px;
-  font-size: 16px;
-}
+  .content {
+    position: relative;
+  }
 
-.sale-border {
-  border: solid red 3px;
-}
+  .add-to-cart {
+    position: absolute;
+    width: 210px;
+    padding: 3px;
+    font-size: 16px;
+  }
 
-.preview {
-  position: absolute;
-  top: -20px;
-  right: 0;
-  width: 210px;
-  height: 210px;
-  padding: 5px;
-}
+  .sale-border {
+    border: solid red 3px;
+  }
 
-.preview-content {
-  border: 1px solid #999;
-}
+  .preview {
+    position: absolute;
+    top: -20px;
+    right: 0;
+    width: 210px;
+    height: 210px;
+    padding: 5px;
+  }
 
-.preview img {
-  width: 50px;
-  height: 50px;
-}
+  .preview-content {
+    border: 1px solid #999;
+  }
 
-.rotate-right {
-  transform: rotate(90deg);
-}
+  .preview img {
+    width: 50px;
+    height: 50px;
+  }
 
-.rotate-left {
-  transform: rotate(-90deg);
-}
+  .rotate-right {
+    transform: rotate(90deg);
+  }
+
+  .rotate-left {
+    transform: rotate(-90deg);
+  }
 </style>
