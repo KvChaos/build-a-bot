@@ -42,10 +42,11 @@
         return this.$store.state.robots.cart;
       },
       cartSaleItems() {
-        return this.$store.getters.cartSaleItems; // Note that we accessed this with a getter -- the getter is a function, but we only reference it, not call it.
+        // Note that we accessed this with a getter -- the getter is a function, but we only reference it, not call it.
+        return this.$store.getters['robots/cartSaleItems'];
       }
     }
-  };
+      };
 </script>
 
 <style scoped>

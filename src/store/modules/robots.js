@@ -4,6 +4,7 @@ import axios from 'axios';
 
 export default {
 
+  namespaced: true,
   state: {
     // All data objects must be initialized with a default value...so Vue can perform change detection
     cart: [],
