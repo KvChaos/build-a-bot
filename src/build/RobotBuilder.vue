@@ -1,5 +1,5 @@
 <template>
-  <div class="content">
+  <div v-if="availableParts" class="content">
     <div class="preview">
       <CollapsibleSection>
         <div class="preview-content">
@@ -51,35 +51,22 @@
         @partSelected="part => this.selectedRobot.base=part"
       />
     </div>
-    <div>
-      <h1>Cart</h1>
-      <table>
-        <thead>
-          <tr>
-            <th>Robot</th>
-            <th class="cost">Cost</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(robot,index) in cart" :key="index">
-            <td>{{robot.head.title}}</td>
-            <td class="cost">{{robot.cost}}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
   </div>
 </template>
 
 
 <script>
-import availableParts from "../data/parts";
+// import availableParts from "../data/parts";   // Before server, we were reading data from a JSON file; this is now a computed property below.
 import createdHookMixin from "./created-hook-mixin";
 import PartSelector from "./PartSelector.vue";
 import CollapsibleSection from "../shared/CollapsibleSection.vue";
 
 export default {
   name: "RobotBuilder",
+  created() {
+    // Instructs the store to invoke its getParts() action; this component will see the results through the new availableParts computed property which reads the store.
+    this.$store.dispatch("getParts");
+  },
   beforeRouteLeave(to, from, next) {
     // When building a route guard on a component, you have to include the word 'Route' -- so this is beforeRouteLeave
     // Warn the user if they try to leave the page without adding their robot to the card.
@@ -96,7 +83,7 @@ export default {
   mixins: [createdHookMixin],
   data() {
     return {
-      availableParts,
+      // availableParts,
       addedToCart: false,
       cart: [],
       selectedRobot: {
@@ -109,7 +96,7 @@ export default {
     };
   },
   methods: {
-    addToCart() {
+    async addToCart() {
       const robot = this.selectedRobot;
       const cost =
         robot.head.cost +
@@ -117,8 +104,19 @@ export default {
         robot.rightArm.cost +
         robot.torso.cost +
         robot.base.cost;
-      this.cart.push(Object.assign({}, robot, { cost })); // This is a form of _.extend into that first empty object.
+
+      // Commit a change to the Vuex store.  The first parameter is the name of the mutation; the second is the data to be sent to the mutation.
+      // After we added the server, we aren't doing this anymore; instead we are dispatching an action to the server.  See the addRobotToCart action in the store.
+      // this.$store.commit("addRobotToCart", Object.assign({}, robot, { cost })); // Object.assign() is a form of _.extend into that first empty object.
+
+      // Call an action on the store.   (Remember, you commit mutations, but you dispatch actions.)
+      // Because the store's action addRobotToCart returns a promise, we can catch promise and when it is resolved, redirect the browser to the cart.
+      await this.$store.dispatch(
+        "addRobotToCart",
+        Object.assign({}, robot, { cost })
+      );
       this.addedToCart = true;
+      this.$router.push("/cart");
     }
   },
   computed: {
@@ -130,6 +128,10 @@ export default {
     },
     saleBorderClass() {
       return this.selectedRobot.head.onSale ? "sale-border" : "";
+    },
+    availableParts() {
+      // This computed property will get updated whenever the store's state.parts value changes (including when the axios call finishes pulling data back from the server).
+      return this.$store.state.robots.parts;
     }
   }
 };
@@ -266,17 +268,6 @@ export default {
   width: 210px;
   padding: 3px;
   font-size: 16px;
-}
-
-td,
-th {
-  text-align: left;
-  padding: 5px;
-  padding-right: 20px;
-}
-
-.cost {
-  text-align: right;
 }
 
 .sale-border {
